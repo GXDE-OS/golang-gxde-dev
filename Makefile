@@ -2,4 +2,5 @@ build:
 	echo Finish
 
 install:
-	cp -rv gocode/* $(DESTDIR)/usr/share/gocode/src/
+	mkdir -pv $(DESTDIR)/usr/share/gocode-gxde/src/
+	cp -rv gocode/* $(DESTDIR)/usr/share/gocode-gxde/src/

@@ -11,8 +11,7 @@ Rules-Requires-Root: no
 
 Package: golang-gxde-dev
 Section: libs
-Architecture: any
-Multi-Arch: same
+Architecture: all
 Pre-Depends: ${misc:Pre-Depends}
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: auto-generated package by debmake

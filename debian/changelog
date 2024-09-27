@@ -1,6 +1,6 @@
-golang-gxde-dev (1.0.1) UNRELEASED; urgency=low
+golang-gxde-dev (1.0.2) UNRELEASED; urgency=low
 
   * Initial release. Closes: #nnnn
     <nnnn is the bug number of your ITP>
 
- -- gfdgd xi <3025613752@qq.com>  Sat, 09 Mar 2024 12:08:35 +0800
+ -- gfdgd_xi <3025613752@qq.com>  Thu, 26 Sep 2024 22:40:14 +0800

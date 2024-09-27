@@ -112,6 +112,8 @@ func splitExec(exec string) ([]string, error) {
 	var outlist []string
 	reader := strings.NewReader(exec)
 	var in bool
+	var doubleIn bool
+	var onlyIn bool
 	for {
 		ch, err := reader.ReadByte()
 		if err != nil {
@@ -133,8 +135,11 @@ func splitExec(exec string) ([]string, error) {
 				buf.Reset()
 			}
 		case '"':
-			in = !in
-			if !in {
+			if !onlyIn {
+				doubleIn = true
+				in = !in
+			}
+			if (!in && doubleIn) {
 				ch0, err0 := reader.ReadByte()
 				if err0 != nil {
 					continue
@@ -143,8 +148,24 @@ func splitExec(exec string) ([]string, error) {
 					return nil, ErrNoSpaceAfterQuoting
 				}
 				_ = reader.UnreadByte()
+				doubleIn = false
 			}
-
+		case '\'':
+			if !doubleIn {
+				onlyIn = true
+				in = !in
+			}
+			if (!in && onlyIn) {
+				ch0, err0 := reader.ReadByte()
+				if err0 != nil {
+					continue
+				}
+				if ch0 != ' ' {
+					return nil, ErrNoSpaceAfterQuoting
+				}
+				_ = reader.UnreadByte()
+				onlyIn = false
+			}
 		case '\\':
 			if in {
 				ch1, err1 := reader.ReadByte()

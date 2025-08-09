@@ -19,6 +19,12 @@
 
 package calendar
 
+import (
+	"strings"
+	"time"
+	"fmt"
+)
+
 type Day struct {
 	Year, Month, Day int
 }
@@ -74,18 +80,21 @@ var solarFestival = map[int]string{
 	730:  "非洲妇女日",
 	801:  "建军节",
 	803:  "男人节",
+	804:  "国际云豹日",
 	808:  "全民健身日 国际猫咪日 中国男子节(爸爸节)",
 	809:  "世界土著人民国际日",
 	810:  "国际狮子日",
 	811:  "世界钢鼓日 全国肢残人活动日",
 	812:  "国际青年节 世界大象日",
-	813:  "国际左撇子日 国际狼日",
+	813:  "国际狼日",
 	814:  "绿色情人节",
 	815:  "抗日战争胜利纪念",
 	818:  "中国人力资源日",
 	819:  "中国医师节 世界人道主义日 世界摄影日",
 	820:  "世界蚊子日",
 	825:  "全国残疾预防日",
+	826:  "律师咨询日",
+	830:  "国际鲸鲨日",
 	903:  "中国人民抗日战争胜利纪念日",
 	908:  "国际扫盲日 国际新闻工作者日",
 	909:  "毛泽东逝世纪念",
@@ -138,9 +147,125 @@ var solarFestival = map[int]string{
 	1231: "deepin15 正式版发布纪念日",
 }
 
+// 动态节日定义表（月份 -> 规则 -> 节日名称）
+var dynamicFestivals = map[int]map[string]string{
+	5: {
+		"second sunday": "母亲节", // 五月第二个星期日
+	},
+	6: {
+		"third sunday": "父亲节", // 六月第三个星期日
+	},
+	11: {
+		"fourth thursday": "感恩节", // 十一月第四个星期四
+	},
+}
+
+// 动态节日规则处理器
+func (d *Day) dynamicFestival() string {
+	rules, ok := dynamicFestivals[d.Month]
+	if !ok {
+		return ""
+	}
+
+	date := time.Date(d.Year, time.Month(d.Month), d.Day, 0, 0, 0, 0, time.UTC)
+	
+	// 尝试所有规则
+	for rule, name := range rules {
+		if matchDynamicRule(date, rule) {
+			return name
+		}
+	}
+	
+	return ""
+}
+
+// 判断日期是否匹配动态规则
+func matchDynamicRule(date time.Time, rule string) bool {
+	// 解析规则：序数 + 星期几
+	var ord, weekday string
+	if _, err := fmt.Sscanf(rule, "%s %s", &ord, &weekday); err != nil {
+		return false
+	}
+	
+	// 获取目标星期几
+	targetWeekday := parseWeekday(weekday)
+	if targetWeekday == -1 || date.Weekday() != time.Weekday(targetWeekday) {
+		return false
+	}
+	
+	// 获取序数位置
+	ordinal := parseOrdinal(ord)
+	if ordinal == 0 {
+		return false
+	}
+	
+	// 计算该日期是当月的第几个目标星期
+	return getWeekPosition(date) == ordinal
+}
+
+// 解析星期几
+func parseWeekday(wd string) int {
+	switch strings.ToLower(wd) {
+	case "sunday": return 0
+	case "monday": return 1
+	case "tuesday": return 2
+	case "wednesday": return 3
+	case "thursday": return 4
+	case "friday": return 5
+	case "saturday": return 6
+	}
+	return -1
+}
+
+// 解析序数
+func parseOrdinal(ord string) int {
+	switch strings.ToLower(ord) {
+	case "first": return 1
+	case "second": return 2
+	case "third": return 3
+	case "fourth": return 4
+	case "fifth": return 5
+	case "last": return -1 // 特殊处理最后一周
+	}
+	return 0
+}
+
+// 计算日期是当月的第几个目标星期
+func getWeekPosition(date time.Time) int {
+	// 获取当月第一天
+	firstDay := time.Date(date.Year(), date.Month(), 1, 0, 0, 0, 0, time.UTC)
+	
+	// 计算第一个目标星期几的日期
+	firstTarget := firstDay
+	for firstTarget.Weekday() != date.Weekday() {
+		firstTarget = firstTarget.AddDate(0, 0, 1)
+	}
+	
+	// 计算当前日期是第几个目标星期
+	daysDiff := date.Day() - firstTarget.Day()
+	weekNum := (daysDiff / 7) + 1
+	
+	// 如果是最后一周，特殊处理
+	if weekNum == 5 || weekNum == 6 {
+		// 检查是否是最后一周
+		lastDay := firstDay.AddDate(0, 1, -1)
+		daysLeft := lastDay.Day() - date.Day()
+		if daysLeft < 7 {
+			return -1 // 标记为最后一周
+		}
+	}
+	
+	return weekNum
+}
+
 func (d *Day) Festival() string {
+	// 检查固定节日
 	key := d.Month*100 + d.Day
 	if name, ok := solarFestival[key]; ok {
+		return name
+	}
+	// 检查动态节日
+	if name := d.dynamicFestival(); name != "" {
 		return name
 	}
 	return ""

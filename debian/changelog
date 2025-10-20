@@ -1,5 +1,6 @@
-golang-gxde-dev (1.0.3) UNRELEASED; urgency=low
+golang-gxde-dev (1.0.4) UNRELEASED; urgency=low
 
   * 新增处理父亲节、母亲节等非固定节日的机制
+  * 修改语言描述（正體中文=》繁體中文（中國臺灣））
 
- -- gfdgd_xi <3025613752@qq.com>  Sun, 10 Aug 2025 07:47:10 +0800
+ -- gfdgd_xi <3025613752@qq.com>  Mon, 20 Oct 2025 21:56:24 +0800

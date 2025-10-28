@@ -1,6 +1,7 @@
-golang-gxde-dev (1.0.4) UNRELEASED; urgency=low
+golang-gxde-dev (1.0.5) UNRELEASED; urgency=low
 
   * 新增处理父亲节、母亲节等非固定节日的机制
   * 修改语言描述（正體中文=》繁體中文（中國臺灣））
+  * 日历新增 台湾光复纪念日
 
- -- gfdgd_xi <3025613752@qq.com>  Mon, 20 Oct 2025 21:56:24 +0800
+ -- gfdgd_xi <3025613752@qq.com>  Tue, 28 Oct 2025 22:27:41 +0800

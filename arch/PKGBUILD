@@ -1,0 +1,26 @@
+# Maintainer: CharOfString <root@charofstring.cc>
+pkgname=golang-gxde-dev
+pkgver=1.0.6
+pkgrel=1
+pkgdesc='Go sources used to build GXDE components (GOPATH at /usr/share/gocode-gxde)'
+arch=('any')
+url="https://github.com/GXDE-OS/golang-gxde-dev"
+# 打包的第三方 Go 源码各自沿用其上游许可证 ・ Vendored Go sources keep their upstream licenses.
+license=('GPL-3.0-or-later' 'Apache-2.0' 'ISC' 'MIT' 'BSD-2-Clause')
+makedepends=('git')
+provides=("golang-gxde-dev-git=$pkgver")
+conflicts=('golang-gxde-dev-git')
+replaces=('golang-gxde-dev-git')
+source=()
+sha512sums=()
+
+# 直接使用 PKGBUILD 所在的 git 仓库作为源码 ・ Build from the git checkout this PKGBUILD lives in.
+_srcroot() {
+  git -C "$startdir" rev-parse --show-toplevel
+}
+
+package() {
+  # 与 Makefile 的 install 目标相同 ・ Same as the install target in Makefile.
+  install -dm755 "$pkgdir/usr/share/gocode-gxde/src"
+  cp -r --no-preserve=ownership "$(_srcroot)/gocode/." "$pkgdir/usr/share/gocode-gxde/src/"
+}
